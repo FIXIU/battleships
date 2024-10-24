@@ -1,13 +1,8 @@
 #include "Board.h"
-#include "windows.h"
 #include <iostream>
 
 using namespace std;
 
-void setConsoleColor(int color) {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, color);
-}
 
 Board::Board(int size) : boardSize(size)
 {
@@ -43,15 +38,13 @@ void Board::printBoard() {
         cout << letter; // print the letter index
 
 //
-//                      TODO: FIX THIS MADNESS
+//                      TODO: FIX THIS MADNESS (most wanted outcome: the water being colored in the windows cmd) !!!!!!!! THE COLOR MESSES WITH THE COMPILER !!!!!!!
 //
 
         for (int j = 0; j < boardSize; j++) {
             if (privateBoard[i][j] == '.') {
                  // print ~ for empty space (water)
-                setConsoleColor(1); // Set color to blue
                 cout << " ~ ";
-                setConsoleColor(7); // Reset to default color
             } else {
                 cout << " o "; // print the ship 
             }
@@ -83,6 +76,13 @@ void Board::placeShip(int posX, int posY, bool orientation, int length)
                 cout << "Error: Ship cannot be placed at the given position." << endl;
                 return;
             }
+
+//                      TEST
+
+            if (privateBoard[posX + 1][i - 1] != '.' || privateBoard[posX - 1][i - 1] != '.' || privateBoard[posX + 1][i + 1] != '.' || privateBoard[posX - 1][i + 1] != '.') {
+                cout << "Error: Ship cannot be placed at the given position." << endl;
+                return;
+            }
         }
         // Place the ship
         for (int i = posY; i < posY + length; i++) {
@@ -107,10 +107,23 @@ void Board::placeShip(int posX, int posY, bool orientation, int length)
                 cout << "Error: Ship cannot be placed at the given position." << endl;
                 return;
             }
+
         }
         // Place the ship
         for (int i = posX; i < posX + length; i++) {
             privateBoard[i][posY] = 'x'; // Use 'x' to represent the ship
         }
     }
+}
+
+bool Board::checkForShips(int posX, int posY)
+{
+    if (privateBoard[posX][posY] == 'x')
+    {
+        return true;
+    }
+    else {
+        return false;
+    }
+    
 }

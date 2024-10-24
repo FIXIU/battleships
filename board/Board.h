@@ -17,6 +17,7 @@ public:
     ~Board();
     void printBoard();
     void placeShip(int posX, int posY, bool orientation, int length);
+    bool checkForShips(int posX, int posY);
 };
 
 #endif
