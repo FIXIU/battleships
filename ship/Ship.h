@@ -4,13 +4,19 @@
 class Ship
 {
 private:
-    int shipLength;
     int posX;
     int posY;
     bool orientation;
 public:
+    int shipLength;
     Ship(int length, int posX, int posY, bool orientation);
     ~Ship();
+    int cellsShot;
+    void shootAt(int posX, int posY, bool hit);
+    bool isSunk();
+    int getPosX();
+    int getPosY();
+    bool getOrientation();
 };
 
 #endif

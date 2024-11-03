@@ -1,13 +1,15 @@
+#pragma once
 #include "Menu.h"
+#include "../player/Player.cc"
 #include <iostream>
+#include <cctype>
 
 using namespace std;
 
 
-Menu::Menu(string playerOneName, string playerTwoName)
+Menu::Menu()
 {
-    this -> playerOneName = playerOneName;
-    this -> playerTwoName = playerTwoName;
+
 }
 
 Menu::~Menu()
@@ -24,19 +26,30 @@ void Menu::showMenu()
     cout << "4. Quit" << endl;
 
     int choice;
+    string input;
     
     cout << "\nPick one of the options: ";
-    cin >> choice;
+    cin >> input;
+    
+    if (isValidNumber(input)) {
+            choice = stringToInt(input);
+    }
 
     switch (choice)
     {
         case 1:
             // TODO: HOTSEAT!!!
             this -> gameMode = 0;
+            cout << "Enter the first player's name: ";
+            cin >> this -> playerOneName;
+            cout << "Enter the second player's name: ";
+            cin >> this -> playerTwoName;
             break;
         case 2:
             // TODO: VS COMPUTER!!!!
             this -> gameMode = 1;
+            cout << "Enter the player's name: ";
+            cin >> this -> playerOneName;
             break;
         case 3:
             credits();
@@ -50,8 +63,15 @@ void Menu::showMenu()
 
         default:
             cout << "Invalid choice. Please try again." << endl;
+            
+            this_thread::sleep_for(chrono::milliseconds(3000));
+            system("CLS");
+
+            showMenu();
             break;
     }
+    this_thread::sleep_for(chrono::milliseconds(500));
+    system("CLS");
 }
 
 void Menu::credits()
@@ -61,7 +81,17 @@ void Menu::credits()
     cout << "pssst... input \'5\' into the selection menu at the start :D" << endl;
 }
 
-bool Menu::checkGameMode()
+bool Menu::getGameMode()
 {
     return this -> gameMode;
+}
+
+string Menu::getPlayerOneName()
+{
+    return this -> playerOneName;
+}
+
+string Menu::getPlayerTwoName()
+{
+    return this -> playerTwoName;
 }

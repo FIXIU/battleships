@@ -12,11 +12,13 @@ private:
     string playerTwoName;
     bool gameMode;
 public:
-    Menu(string playerOneName, string playerTwoName);
+    Menu();
     ~Menu();
     void showMenu();
     void credits();
-    bool checkGameMode();
+    bool getGameMode();
+    string getPlayerOneName();
+    string getPlayerTwoName();
 };
 
 
