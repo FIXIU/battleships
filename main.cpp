@@ -42,204 +42,180 @@ void createPlayers(bool gameMode, Player &playerOne, Player &playerTwo, Menu &me
     }
 }
 
+int getXCoordinates()
+{
+    string input;
+    int posX;
+    bool rightInput = 0;
+
+    cout << "\tX coordinates: ";
+
+    while (rightInput == 0)
+    {
+        cin >> input;
+        if (isValidNumber(input))
+        {
+            posX = translateInput(input);
+            rightInput = 1;
+        }
+        else {
+            cout << "Invalid input. Please enter a number." << endl;
+            this_thread::sleep_for(chrono::milliseconds(3000));
+            system("CLS");
+            return -1;
+        }
+    }
+    return posX;
+}
+
+int getYCoordinates()
+{
+    string input;
+    int posY;
+    bool rightInput = 0;
+
+    cout << "\tY coordinates: ";
+
+    while (rightInput == 0)
+    {
+        cin >> input;
+        if (isValidNumber(input))
+        {
+            posY = translateInput(input);
+            rightInput = 1;
+        }
+        else {
+            cout << "Invalid input. Please enter a number." << endl;
+            this_thread::sleep_for(chrono::milliseconds(3000));
+            system("CLS");
+            return -1;
+        }
+    }
+    return posY;
+    
+}
+
+bool playerOneTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerOne, Menu &newMenu)
+{
+    bool hit = 0;
+    int posX, posY;
+    string input;
+    cout << "Your board" << endl;
+    playerOneBoard.printBoard();
+    cout << newMenu.getPlayerTwoName() << "'s board" << endl;
+    playerTwoBoard.printBoardForEnemy();
+    cout << "Which cell do you want to shoot?" << endl;
+    
+    posX = getXCoordinates();
+    posY = getYCoordinates();
+
+    if (posX == -1 || posY == -1)
+    {
+        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+    }
+
+    if (posY > playerTwoBoard.getSize() || posX > playerTwoBoard.getSize())
+    {
+        cout << "You tried to shoot outside of the board! Try again.";
+        this_thread::sleep_for(chrono::milliseconds(3000));
+        system("CLS");
+        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+    }
+
+    if (playerTwoBoard.checkForShips(posX-1, posY-1) == 3)
+    {
+        cout << "You've missed!" << endl;
+        hit = 0;
+    }
+    else if (playerTwoBoard.checkForShips(posX-1, posY-1) == 2)
+    {
+        cout << "You can't shoot a cell you've already shot at! Try again!" << endl;
+        this_thread::sleep_for(chrono::milliseconds(3000));
+        system("CLS");
+        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+        hit = 0;
+    }
+    else {
+        cout << "You've hit a ship!";
+        hit = 1;
+    }
+
+    this_thread::sleep_for(chrono::milliseconds(1000));
+    system("CLS");
+
+    playerTwoBoard.shootForEnemy(posX-1, posY-1);
+    cout << "Here's the updated board:" << endl;
+    playerTwoBoard.printBoardForEnemy();
+
+    return hit;
+}
+
+bool playerTwoTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerOne, Menu &newMenu)
+{
+    bool hit = 0;
+    int posX, posY;
+    string input;
+    cout << "Your board" << endl;
+    playerTwoBoard.printBoard();
+    cout << newMenu.getPlayerOneName() << "'s board" << endl;
+    playerOneBoard.printBoardForEnemy();
+    cout << "Which cell do you want to shoot?" << endl;
+
+    posX = getXCoordinates();
+    posY = getYCoordinates();
+
+    if (posX == -1 || posY == -1)
+    {
+        playerTwoTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+    }
+
+
+    if (posY > playerOneBoard.getSize() || posX > playerOneBoard.getSize())
+    {
+        cout << "You tried to shoot outside of the board! Try again.";
+        this_thread::sleep_for(chrono::milliseconds(3000));
+        system("CLS");
+        playerTwoTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+    }
+
+    if (playerOneBoard.checkForShips(posX-1, posY-1) == false)
+    {
+        cout << "You've missed!" << endl;
+    }
+    else {
+        cout << "You've hit a ship!" << endl;
+    }
+
+    this_thread::sleep_for(chrono::milliseconds(1000));
+    system("CLS");
+
+    playerOneBoard.shootForEnemy(posX-1, posY-1);
+    cout << "Here's the updated board:" << endl;
+    playerOneBoard.printBoardForEnemy();
+
+    return hit;
+}
+
 void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoard, Board &playerTwoBoard, Menu &newMenu, Player &playerOne, Player &playerTwo)
 {
-    int posX, posY;
-    bool hit;
-    int choice;
+    int posX, posY, choice;
+    bool hit = 0;
     string input;
 
     if (newMenu.getGameMode() == false)
     {
         if (currentPlayer == false)
         {
-            // Player 1's turn
-            cout << "Your board" << endl;
-            playerOneBoard.printBoard();
-            cout << newMenu.getPlayerTwoName() << "'s board" << endl;
-            playerTwoBoard.printBoardForEnemy();
-            cout << "Which cell do you want to shoot?" << endl;
-            cout << "\tX coordinates: ";
-            cin >> input;
-            
-
-            if (isValidNumber(input))
-            {
-                posX = translateInput(input);
-            }
-            else {
-                cout << "Invalid input. Please enter a number." << endl;
-                this_thread::sleep_for(chrono::milliseconds(3000));
-                system("CLS");
-                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-            }
-            
-    
-            
-            cout << "\tY coordinates: ";
-            cin >> input;
-
-            if (isValidNumber(input))
-            {
-                posY = translateInput(input);
-            }
-            else {
-                cout << "Invalid input. Please enter a number." << endl;
-                this_thread::sleep_for(chrono::milliseconds(3000));
-                system("CLS");
-                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-            }
-
-            if (posY > playerTwoBoard.getSize() || posX > playerTwoBoard.getSize())
-            {
-                cout << "You tried to shoot outside of the board! Try again.";
-                this_thread::sleep_for(chrono::milliseconds(3000));
-                system("CLS");
-                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-            }
-
-            if (playerTwoBoard.checkForShips(posX-1, posY-1) == 3)
-            {
-                cout << "You've missed!" << endl;
-                hit = 0;
-            }
-            else if (playerTwoBoard.checkForShips(posX-1, posY-1) == 2)
-            {
-                cout << "You can't shoot a cell you've already shot at! Try again!" << endl;
-                this_thread::sleep_for(chrono::milliseconds(3000));
-                system("CLS");
-                turn(currentPlayer, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-                return;
-                hit = 0;
-            }
-            else {
-                cout << "You've hit a ship!";
-                hit = 1;
-            }
-
-            this_thread::sleep_for(chrono::milliseconds(1000));
-            system("CLS");
-
-            playerTwoBoard.shootForEnemy(posX-1, posY-1);
-            cout << "Here's the updated board:" << endl;
-            playerTwoBoard.printBoardForEnemy();
+            playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
         }
         else
         {
-            // Player 2's turn
-            cout << "Your board" << endl;
-            playerTwoBoard.printBoard();
-            cout << newMenu.getPlayerOneName() << "'s board" << endl;
-            playerOneBoard.printBoardForEnemy();
-            cout << "Which cell do you want to shoot?" << endl;
-            cout << "\tX coordinates: ";
-            cin >> input;
-            if (isValidNumber(input))
-            {
-                posX = translateInput(input);
-            }
-            else {
-                cout << "Invalid input. Please enter a number." << endl;
-                this_thread::sleep_for(chrono::milliseconds(3000));
-                system("CLS");
-                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-            }
-            cout << "\tY coordinates: ";
-            cin >> input;
-            if (isValidNumber(input))
-            {
-                posY = translateInput(input);
-            }
-            else {
-                cout << "Invalid input. Please enter a number." << endl;
-                this_thread::sleep_for(chrono::milliseconds(3000));
-                system("CLS");
-                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-            }
-
-            if (posY > playerOneBoard.getSize() || posX > playerOneBoard.getSize())
-            {
-                cout << "You tried to shoot outside of the board! Try again.";
-                this_thread::sleep_for(chrono::milliseconds(3000));
-                system("CLS");
-                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-            }
-
-
-            if (playerOneBoard.checkForShips(posX-1, posY-1) == false)
-            {
-                cout << "You've missed!" << endl;
-            }
-            else {
-                cout << "You've hit a ship!" << endl;
-            }
-
-            this_thread::sleep_for(chrono::milliseconds(1000));
-            system("CLS");
-
-            playerOneBoard.shootForEnemy(posX-1, posY-1);
-            cout << "Here's the updated board:" << endl;
-            playerOneBoard.printBoardForEnemy();
+            playerTwoTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
         }
     }
     else 
     {
-        // Player's turn TODO: FIX THIS TO WORK WITH THE COMPUTER !IMPORTANT! there's a playerTwoBoard object used, we don't want that
-            cout << "Your board" << endl;
-            playerOneBoard.printBoard();
-            cout << newMenu.getPlayerTwoName() << "'s board" << endl;
-            playerTwoBoard.printBoardForEnemy();
-                    cout << "Which cell do you want to shoot?" << endl;
-            cout << "\tX coordinates: ";
-            cin >> input;
-            if (isValidNumber(input))
-            {
-                posX = translateInput(input);
-            }
-            else {
-                cout << "Invalid input. Please enter a number." << endl;
-                this_thread::sleep_for(chrono::milliseconds(3000));
-                system("CLS");
-                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-            }
-            cout << "\tY coordinates: ";
-            cin >> input;
-            if (isValidNumber(input))
-            {
-                posY = translateInput(input);
-            }
-            else {
-                cout << "Invalid input. Please enter a number." << endl;
-                this_thread::sleep_for(chrono::milliseconds(3000));
-                system("CLS");
-                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-            }
-
-            if (posY > playerTwoBoard.getSize() || posX > playerTwoBoard.getSize())
-            {
-                cout << "You tried to shoot outside of the board! Try again.";
-                this_thread::sleep_for(chrono::milliseconds(3000));
-                system("CLS");
-                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-            }
-            
-
-            if (playerTwoBoard.checkForShips(posX-1, posY-1) == false)
-            {
-                cout << "You've missed!" << endl;
-                hit = 0;
-            }
-            else {
-                cout << "You've hit a ship!" << endl;
-                hit = 1;
-            }
-
-            this_thread::sleep_for(chrono::milliseconds(1000));
-            system("CLS");
-
-            playerTwoBoard.shootForEnemy(posX-1, posY-1);
-            cout << "Here's the updated board:" << endl;
-            playerTwoBoard.printBoardForEnemy();
+        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
     }   
 
     this_thread::sleep_for(chrono::milliseconds(3000));
@@ -247,13 +223,6 @@ void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoa
     
     if (playerOneBoard.allShipsSunk() != 1 && playerTwoBoard.allShipsSunk() != 1)
     {
-        /*
-        I've figured this is the excact same thing as it was earlier, just simpler (note for future self)
-        if (!hit)
-        {
-            currentPlayer = !currentPlayer;
-        }
-        */
         currentPlayer = (hit) ? currentPlayer : !currentPlayer;
 
         turnNumber++;
@@ -350,6 +319,7 @@ void multiPlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &pl
 //                          TODO: https://calendar.google.com/calendar/u/0/r/tasks
 //                          TODO: ADD THE COMPUTER
 //                          TODO: maybe add a thingy that says "give the seat to the other player and asks for input when they've changed"
+//                          TODO: no string int check at the place ships
 //a
 //
 //
