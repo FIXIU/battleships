@@ -9,7 +9,7 @@ using namespace std;
 
 Menu::Menu()
 {
-
+    this -> quit = 0;
 }
 
 Menu::~Menu()
@@ -55,7 +55,7 @@ void Menu::showMenu()
             credits();
             break;
         case 4:
-            // TODO: QUIT!!
+            this -> quit = 1;
             break;
         case 5:
             cout << "Stack overflow didn't help... just paste this link into your browser... https://www.youtube.com/watch?v=dQw4w9WgXcQ" << endl;

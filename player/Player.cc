@@ -11,6 +11,12 @@ Player::Player(string playerName, int playerScore)
 {
     this -> name = playerName;
     this -> score = playerScore;
+
+    for (int i = 3; i >= 0; i--)
+    {
+        this -> numOfShips[i] = 0; // TODO: change to this -> numOfShips[i] = i+1;
+    }
+    
 }
 
 Player::~Player()
@@ -148,5 +154,28 @@ void Player::placeShips(Board& playerBoard)
         cout << "You have placed all your ships!" << endl;
         this_thread::sleep_for(chrono::milliseconds(3000)); // TODO: check if this works
         system("CLS");
+    }
+}
+
+string Player::getName()
+{
+    return this -> name;
+}
+
+void Player::addPlayerScore(int score)
+{
+    this -> score += score;
+}
+
+int Player::getScore()
+{
+    return this -> score;
+}
+
+void Player::clearShips()
+{
+    for (int i = 3; i >= 0; i--)
+    {
+        this -> numOfShips[i] = i+1; // TODO: change to this -> numOfShips[i] = i+1;
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Board.h"
 #include "../ship/Ship.cc"
+#include "../player/Player.cc"
 #include <iostream>
 
 using namespace std;
@@ -204,14 +205,18 @@ void Board::unplaceShip(int posX, int posY, bool orientation, int length)
     }
 }
 
-bool Board::checkForShips(int posX, int posY)
+int Board::checkForShips(int posX, int posY)
 {
     if (privateBoard[posX][posY] == 'o')
     {
-        return true;
+        return 1;
+    }
+    else if (privateBoard[posX][posY] == 'x' || privateBoard[posX][posY] == 'm')
+    {
+        return 2;
     }
     else {
-        return false;
+        return 3;
     }
     
 }
@@ -225,4 +230,36 @@ void Board::shootForEnemy(int posX, int posY)
     else {
         privateBoard[posX][posY] = 'm'; // Mark the cell as missed
     }
+}
+
+bool Board::allShipsSunk()
+{
+    for (int i = 0; i < this -> boardSize; i++)
+    {
+        for (int j = 0; j < this -> boardSize; j++)
+        {
+            if (this -> privateBoard[i][j] == 'o')
+            {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int Board::getSize()
+{
+    return this -> boardSize;
+}
+
+void Board::clearBoard()
+{
+    for (int i = 0; i < this -> boardSize; i++)
+    {
+        for (int j = 0; j < this -> boardSize; j++)
+        {
+            privateBoard[i][j] = '.';
+        } 
+    }
+    
 }

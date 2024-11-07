@@ -19,6 +19,16 @@ void createBoards(bool gameMode, Board &playerOneBoard, Board &playerTwoBoard)
     }
 }
 
+int translateInput(string input)
+{
+    if (isValidNumber(input)) {
+        return stringToInt(input);
+    }
+    else {
+        return -1;
+    }
+}
+
 void createPlayers(bool gameMode, Player &playerOne, Player &playerTwo, Menu &menu)
 {
     if (gameMode == 0)
@@ -32,10 +42,12 @@ void createPlayers(bool gameMode, Player &playerOne, Player &playerTwo, Menu &me
     }
 }
 
-void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoard, Board &playerTwoBoard, Menu &newMenu)
+void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoard, Board &playerTwoBoard, Menu &newMenu, Player &playerOne, Player &playerTwo)
 {
     int posX, posY;
     bool hit;
+    int choice;
+    string input;
 
     if (newMenu.getGameMode() == false)
     {
@@ -48,16 +60,60 @@ void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoa
             playerTwoBoard.printBoardForEnemy();
             cout << "Which cell do you want to shoot?" << endl;
             cout << "\tX coordinates: ";
-            cin >> posX;
+            cin >> input;
+            
+
+            if (isValidNumber(input))
+            {
+                posX = translateInput(input);
+            }
+            else {
+                cout << "Invalid input. Please enter a number." << endl;
+                this_thread::sleep_for(chrono::milliseconds(3000));
+                system("CLS");
+                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+            }
+            
+    
+            
             cout << "\tY coordinates: ";
-            cin >> posY;
-            if (playerTwoBoard.checkForShips(posX-1, posY-1) == false)
+            cin >> input;
+
+            if (isValidNumber(input))
+            {
+                posY = translateInput(input);
+            }
+            else {
+                cout << "Invalid input. Please enter a number." << endl;
+                this_thread::sleep_for(chrono::milliseconds(3000));
+                system("CLS");
+                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+            }
+
+            if (posY > playerTwoBoard.getSize() || posX > playerTwoBoard.getSize())
+            {
+                cout << "You tried to shoot outside of the board! Try again.";
+                this_thread::sleep_for(chrono::milliseconds(3000));
+                system("CLS");
+                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+            }
+
+            if (playerTwoBoard.checkForShips(posX-1, posY-1) == 3)
             {
                 cout << "You've missed!" << endl;
                 hit = 0;
             }
+            else if (playerTwoBoard.checkForShips(posX-1, posY-1) == 2)
+            {
+                cout << "You can't shoot a cell you've already shot at! Try again!" << endl;
+                this_thread::sleep_for(chrono::milliseconds(3000));
+                system("CLS");
+                turn(currentPlayer, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+                return;
+                hit = 0;
+            }
             else {
-                cout << "You've hit a ship!" << endl;
+                cout << "You've hit a ship!";
                 hit = 1;
             }
 
@@ -77,9 +133,39 @@ void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoa
             playerOneBoard.printBoardForEnemy();
             cout << "Which cell do you want to shoot?" << endl;
             cout << "\tX coordinates: ";
-            cin >> posX;
+            cin >> input;
+            if (isValidNumber(input))
+            {
+                posX = translateInput(input);
+            }
+            else {
+                cout << "Invalid input. Please enter a number." << endl;
+                this_thread::sleep_for(chrono::milliseconds(3000));
+                system("CLS");
+                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+            }
             cout << "\tY coordinates: ";
-            cin >> posY;
+            cin >> input;
+            if (isValidNumber(input))
+            {
+                posY = translateInput(input);
+            }
+            else {
+                cout << "Invalid input. Please enter a number." << endl;
+                this_thread::sleep_for(chrono::milliseconds(3000));
+                system("CLS");
+                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+            }
+
+            if (posY > playerOneBoard.getSize() || posX > playerOneBoard.getSize())
+            {
+                cout << "You tried to shoot outside of the board! Try again.";
+                this_thread::sleep_for(chrono::milliseconds(3000));
+                system("CLS");
+                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+            }
+
+
             if (playerOneBoard.checkForShips(posX-1, posY-1) == false)
             {
                 cout << "You've missed!" << endl;
@@ -105,9 +191,39 @@ void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoa
             playerTwoBoard.printBoardForEnemy();
                     cout << "Which cell do you want to shoot?" << endl;
             cout << "\tX coordinates: ";
-            cin >> posX;
+            cin >> input;
+            if (isValidNumber(input))
+            {
+                posX = translateInput(input);
+            }
+            else {
+                cout << "Invalid input. Please enter a number." << endl;
+                this_thread::sleep_for(chrono::milliseconds(3000));
+                system("CLS");
+                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+            }
             cout << "\tY coordinates: ";
-            cin >> posY;
+            cin >> input;
+            if (isValidNumber(input))
+            {
+                posY = translateInput(input);
+            }
+            else {
+                cout << "Invalid input. Please enter a number." << endl;
+                this_thread::sleep_for(chrono::milliseconds(3000));
+                system("CLS");
+                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+            }
+
+            if (posY > playerTwoBoard.getSize() || posX > playerTwoBoard.getSize())
+            {
+                cout << "You tried to shoot outside of the board! Try again.";
+                this_thread::sleep_for(chrono::milliseconds(3000));
+                system("CLS");
+                turn(false, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+            }
+            
+
             if (playerTwoBoard.checkForShips(posX-1, posY-1) == false)
             {
                 cout << "You've missed!" << endl;
@@ -129,60 +245,110 @@ void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoa
     this_thread::sleep_for(chrono::milliseconds(3000));
     system("CLS");
     
-    /*
-    I've figured this is the excact same thing as it was earlier, just simpler (note for future self)
-    if (!hit)
+    if (playerOneBoard.allShipsSunk() != 1 && playerTwoBoard.allShipsSunk() != 1)
     {
-        currentPlayer = !currentPlayer;
-    }
-    */
-    currentPlayer = (hit) ? currentPlayer : !currentPlayer;
+        /*
+        I've figured this is the excact same thing as it was earlier, just simpler (note for future self)
+        if (!hit)
+        {
+            currentPlayer = !currentPlayer;
+        }
+        */
+        currentPlayer = (hit) ? currentPlayer : !currentPlayer;
 
-    turnNumber++;
-    turn(currentPlayer, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu);
+        turnNumber++;
+        turn(currentPlayer, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
+    }
+
+    if (currentPlayer)
+    {
+        playerTwo.addPlayerScore(1);
+    }
+    else {
+        playerOne.addPlayerScore(1);
+    }
+    
+}
+
+void clearAll(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &playerOneBoard, Board &playerTwoBoard)
+{
+    playerOne.clearShips();
+    playerTwo.clearShips();
+
+    playerOneBoard.clearBoard();
+    playerTwoBoard.clearBoard();
 }
 
 void multiPlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &playerOneBoard, Board &playerTwoBoard)
 {
-    playerOneBoard.placeShip(1-1, 1-1, 1, 1);
-    playerOneBoard.placeShip(1-1, 3-1, 1, 1);
-    playerOneBoard.placeShip(1-1, 5-1, 1, 1);
-    playerOneBoard.placeShip(1-1, 7-1, 1, 1);
-    
-    playerOneBoard.placeShip(1-1, 9-1, 1, 2);
-    playerOneBoard.placeShip(3-1, 1-1, 1, 2);
-    playerOneBoard.placeShip(3-1, 4-1, 1, 2);
+    int onePreviousScore, twoPreviousScore, winnerScore;
+    string winnerName;
 
-    playerOneBoard.placeShip(5-1, 1-1, 1, 3);
-    playerOneBoard.placeShip(5-1, 5-1, 1, 3);
-    
-    playerOneBoard.placeShip(3-1, 7-1, 1, 4);
+    system("CLS");
 
-
-    playerTwoBoard.placeShip(1-1, 1-1, 1, 1);
-    playerTwoBoard.placeShip(1-1, 3-1, 1, 1);
-    playerTwoBoard.placeShip(1-1, 5-1, 1, 1);
-    playerTwoBoard.placeShip(1-1, 7-1, 1, 1);
     
-    playerTwoBoard.placeShip(1-1, 9-1, 1, 2);
-    playerTwoBoard.placeShip(3-1, 1-1, 1, 2);
-    playerTwoBoard.placeShip(3-1, 4-1, 1, 2);
-
-    playerTwoBoard.placeShip(5-1, 1-1, 1, 3);
-    playerTwoBoard.placeShip(5-1, 5-1, 1, 3);
-    
-    playerTwoBoard.placeShip(3-1, 7-1, 1, 4);
     
     playerOne.placeShips(playerOneBoard);
     playerTwo.placeShips(playerTwoBoard);
 
-    turn(0, 0, 0, playerOneBoard, playerTwoBoard, mainMenu);
+    turn(0, 1, 0, playerOneBoard, playerTwoBoard, mainMenu, playerOne, playerTwo);
 
+    char Yn;
+
+    if (onePreviousScore < playerOne.getScore())
+    {
+        winnerName = playerOne.getName();
+        winnerScore = playerOne.getScore();
+    }
+    else {
+        winnerName = playerTwo.getName();
+        winnerScore = playerTwo.getScore();
+    }
+    
+    
+
+    cout << "Congratulations " << winnerName << " you have won this game!" << endl;
+    cout << "Your score is now: " << winnerScore + 1;
+
+    this_thread::sleep_for(chrono::milliseconds(3000));
+    
+    bool f = 0;
+
+    onePreviousScore = playerOne.getScore();
+    twoPreviousScore = playerTwo.getScore();
+
+    while (f == 0)
+    {
+        system("CLS");
+
+        cout << playerOne.getName() << " score: " << playerOne.getScore() << endl;
+        cout << playerTwo.getName() << " score: " << playerTwo.getScore() << endl;
+
+        cout << "\nDo you want to play again? (Y/N): ";
+        cin >> Yn;
+
+        clearAll(mainMenu, playerOne, playerTwo, playerOneBoard, playerTwoBoard);
+
+        if (Yn == 'Y' || Yn == 'y')
+        {
+            multiPlayer(mainMenu, playerOne, playerTwo, playerOneBoard, playerTwoBoard);
+            f = 1;
+        }
+        else if (Yn == 'N' || Yn == 'n')
+        {
+            f = 1;
+        }
+        else {
+            cout << "Invalid input. Please enter Y or N.";
+            this_thread::sleep_for(chrono::milliseconds(2000));
+        }
+    }
+    system("CLS");
 //
 //
 //a
 //                          TODO: https://calendar.google.com/calendar/u/0/r/tasks
-//                          TODO: ADD COLORS AND FINISH THE GAME (ADD A CHECK FOR IF ALL THE SHIPS HAVE BEEN SUNK)
+//                          TODO: ADD THE COMPUTER
 //                          TODO: maybe add a thingy that says "give the seat to the other player and asks for input when they've changed"
 //a
 //
@@ -192,9 +358,11 @@ void multiPlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &pl
 void game(Menu &mainMenu)
 {
     mainMenu.showMenu();
-    // Creating the player objects
-
-    // Creating the board objects
+    
+    if (mainMenu.quit)
+    {
+        return;
+    }
 
     
     if (!mainMenu.getGameMode())
@@ -206,13 +374,75 @@ void game(Menu &mainMenu)
         Board playerOneBoard(10);
         Board playerTwoBoard(10);
 
+        playerOneBoard.placeShip(1-1, 1-1, 1, 1);
+        playerOneBoard.placeShip(1-1, 3-1, 1, 1);
+        playerOneBoard.placeShip(1-1, 5-1, 1, 1);
+        playerOneBoard.placeShip(1-1, 7-1, 1, 1);
+        
+        playerOneBoard.placeShip(1-1, 9-1, 1, 2);
+        playerOneBoard.placeShip(3-1, 1-1, 1, 2);
+        playerOneBoard.placeShip(3-1, 4-1, 1, 2);
+
+        playerOneBoard.placeShip(5-1, 1-1, 1, 3);
+        playerOneBoard.placeShip(5-1, 5-1, 1, 3);
+        
+        playerOneBoard.placeShip(3-1, 7-1, 1, 4);
+
+
+        playerTwoBoard.placeShip(1-1, 1-1, 1, 1);
+        playerTwoBoard.placeShip(1-1, 3-1, 1, 1);
+        playerTwoBoard.placeShip(1-1, 5-1, 1, 1);
+        playerTwoBoard.placeShip(1-1, 7-1, 1, 1);
+        
+        playerTwoBoard.placeShip(1-1, 9-1, 1, 2);
+        playerTwoBoard.placeShip(3-1, 1-1, 1, 2);
+        playerTwoBoard.placeShip(3-1, 4-1, 1, 2);
+
+        playerTwoBoard.placeShip(5-1, 1-1, 1, 3);
+        playerTwoBoard.placeShip(5-1, 5-1, 1, 3);
+        
+        playerTwoBoard.placeShip(3-1, 7-1, 1, 4);
+
+
+
+        playerTwoBoard.shootForEnemy(1-1, 3-1);
+
+        playerTwoBoard.shootForEnemy(1-1, 5-1);
+
+        playerTwoBoard.shootForEnemy(1-1, 7-1);
+        
+
+        playerTwoBoard.shootForEnemy(1-1, 9-1);
+        playerTwoBoard.shootForEnemy(1-1, 10-1);
+
+        playerTwoBoard.shootForEnemy(3-1, 1-1);
+        playerTwoBoard.shootForEnemy(3-1, 2-1);
+        
+        playerTwoBoard.shootForEnemy(3-1, 4-1);
+        playerTwoBoard.shootForEnemy(3-1, 5-1);
+
+
+        playerTwoBoard.shootForEnemy(5-1, 1-1);
+        playerTwoBoard.shootForEnemy(5-1, 2-1);
+        playerTwoBoard.shootForEnemy(5-1, 3-1);
+
+        playerTwoBoard.shootForEnemy(5-1, 5-1);
+        playerTwoBoard.shootForEnemy(5-1, 6-1);
+        playerTwoBoard.shootForEnemy(5-1, 7-1);
+        
+
+        playerTwoBoard.shootForEnemy(3-1, 7-1);
+        playerTwoBoard.shootForEnemy(3-1, 8-1);
+        playerTwoBoard.shootForEnemy(3-1, 9-1);
+        playerTwoBoard.shootForEnemy(3-1, 10-1);
+
         multiPlayer(mainMenu, playerOne, playerTwo, playerOneBoard, playerTwoBoard);
     }
     else {
         //TODO: Single player (vs computer)
     }
     
-
+    game(mainMenu);
 }
 
 int main()
@@ -221,6 +451,8 @@ int main()
 
     game(mainMenu);
 
+
+    return 0;
 
     // Board playerOneBoard(10);
     // Board playerTwoBoard(10);

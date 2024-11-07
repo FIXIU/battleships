@@ -19,6 +19,7 @@ public:
     bool getGameMode();
     string getPlayerOneName();
     string getPlayerTwoName();
+    bool quit;
 };
 
 
