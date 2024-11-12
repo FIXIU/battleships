@@ -1,3 +1,4 @@
+#pragma once
 #include "Ship.h"
 #include "../board/Board.cc"
 
@@ -12,6 +13,16 @@ Ship::Ship(int length, int posX, int posY, bool orientation)
     this -> posY = posY;
     this -> orientation = orientation;
     this -> cellsShot = 0;
+    if (orientation)
+    {
+        for (int i = posY; i < posY + length; i++) {
+            this -> position.push_back(i);
+        }
+    } else {
+        for (int i = posX; i < posX + length; i++) {
+            this -> position.push_back(i);
+        }
+    }
 }
 
 Ship::~Ship()
@@ -50,4 +61,8 @@ int Ship::getPosY()
 bool Ship::getOrientation()
 {
     return this -> orientation;
+}
+
+void Ship::markShipSunk()
+{
 }

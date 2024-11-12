@@ -1,6 +1,7 @@
 #pragma once
 #include "Player.h"
-#include "../board/Board.cc"
+#include "../board/Board.h"
+#include "../ship/Ship.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -87,9 +88,27 @@ void Player::placeShips(Board& playerBoard)
             case 3:
             case 4:
                 cout << "select the X position you'd like to place your ship at: ";
-                cin >> posX;
+                cin >> input;
+                if (isValidNumber(input)) {
+                    posX = stringToInt(input);
+                }
+                else {
+                    cout << "Invalid input. Please enter a number." << endl;
+                    this_thread::sleep_for(chrono::milliseconds(3000));
+                    system("CLS");
+                    placeShips(playerBoard);
+                }
                 cout << "select the Y position you'd like to place your ship at: ";
-                cin >> posY;
+                cin >> choice;
+                if (isValidNumber(input)) {
+                    posY = stringToInt(input);
+                }
+                else {
+                    cout << "Invalid input. Please enter a number." << endl;
+                    this_thread::sleep_for(chrono::milliseconds(3000));
+                    system("CLS");
+                    placeShips(playerBoard);
+                }
                 cout << "select the orientation you'd like your ship to face (N, E, S, W): ";
                 cin >> orientation;
                 if (orientation == 'N' || orientation == 'n')
@@ -137,10 +156,11 @@ void Player::placeShips(Board& playerBoard)
                 }
                 else {
                     numOfShips[choice-1] -= 1;
+                    ships.push_back(Ship(length, posX-1, posY-1, orientationToF));
                 }
             }
             else {
-                this_thread::sleep_for(chrono::milliseconds(3000)); // TODO: WORK ON THIS
+                this_thread::sleep_for(chrono::milliseconds(3000));
             }
         }
         else {
@@ -152,7 +172,7 @@ void Player::placeShips(Board& playerBoard)
     }
     else {
         cout << "You have placed all your ships!" << endl;
-        this_thread::sleep_for(chrono::milliseconds(3000)); // TODO: check if this works
+        this_thread::sleep_for(chrono::milliseconds(3000));
         system("CLS");
     }
 }
@@ -178,4 +198,9 @@ void Player::clearShips()
     {
         this -> numOfShips[i] = i+1; // TODO: change to this -> numOfShips[i] = i+1;
     }
+}
+
+vector<Ship> &Player::getShips()
+{
+    return this -> ships;
 }

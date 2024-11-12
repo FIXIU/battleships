@@ -47,18 +47,22 @@ void Board::printBoard() {
         for (int j = 0; j < boardSize; j++) {
             if (privateBoard[i][j] == '.') {
                  // print ~ for empty space (water)
-                cout << " ~ ";
+                cout << "\033[34m ~ \033[0m";
             } 
             else if (privateBoard[i][j] == 'x')
             {
-                cout << " X "; // print the hit
+                cout << "\033[31m X \033[0m"; // print the hit
             }
             else if (privateBoard[i][j] == 'm')
             {
-                cout << " M "; // print miss
+                cout << "\033[33m M \033[0m"; // print miss
+            }
+            else if (privateBoard[i][j] == '#')
+            {
+                cout << " # ";
             }
             else {
-                cout << " o "; // print the ship 
+                cout << "\033[32m o \033[0m"; // print the ship 
             }
         }
 
@@ -66,8 +70,9 @@ void Board::printBoard() {
     }
 }
 
-void Board::printBoardForEnemy()
+void Board::printBoardForEnemy(Player &currentPlayer)
 {
+    markSunkShips(currentPlayer); // mark all sunk ships before the board prints for enemy
     // Print the top row with numbers
     cout << " ";
     for (int i = 0; i < boardSize; i++)
@@ -98,14 +103,18 @@ void Board::printBoardForEnemy()
         for (int j = 0; j < boardSize; j++) {
             if(privateBoard[i][j] == 'x')
             {
-                cout << " X ";
+                cout << "\033[31m X \033[0m";
             }
             else if(privateBoard[i][j] == 'm')
             {
-                cout << " O ";
+                cout << "\033[33m M \033[0m";
+            }
+            else if (privateBoard[i][j] == '#')
+            {
+                cout << "\033[32m # \033[0m";
             }
             else {
-                cout << " ~ ";
+                cout << "\033[34m ~ \033[0m";
             }
         }
 
@@ -127,8 +136,8 @@ bool Board::placeShip(int posX, int posY, bool orientation, int length) {
                 return false;
             }
             // Check adjacent cells
-            for (int dx = -1; dx <= 1; ++dx) {
-                for (int dy = -1; dy <= 1; ++dy) {
+            for (int dx = -1; dx <= 1; dx++) { //changed from ++dx
+                for (int dy = -1; dy <= 1; dy++) { // --||--
                     // Skip the cell itself
                     if (dx == 0 && dy == 0) continue;
 
@@ -211,7 +220,7 @@ int Board::checkForShips(int posX, int posY)
     {
         return 1;
     }
-    else if (privateBoard[posX][posY] == 'x' || privateBoard[posX][posY] == 'm')
+    else if (privateBoard[posX][posY] == 'x' || privateBoard[posX][posY] == 'm' || privateBoard[posX][posY] == '#')
     {
         return 2;
     }
@@ -262,4 +271,36 @@ void Board::clearBoard()
         } 
     }
     
+}
+
+void Board::markSunkShips(Player &player) {
+    vector<Ship> ships = player.getShips();
+    for (Ship &ship : ships) {
+        if (ship.isSunk()) {
+            // Get ship's coordinates
+            int startX = ship.getPosX();
+            int startY = ship.getPosY();
+            bool orientation = ship.getOrientation();
+
+            // Mark the ship itself with '#'
+            for (int i = 0; i < ship.shipLength; ++i) {
+                if (orientation) {
+                    privateBoard[startX][startY + i] = '#';
+                } else {
+                    privateBoard[startX + i][startY] = '#';
+                }
+            }
+
+            // Mark surrounding cells with '#'
+            for (int i = startX - 1; i <= startX + 1; ++i) {
+                for (int j = startY - 1; j <= startY + ship.shipLength; ++j) {
+                    if (i >= 0 && i < boardSize && j >= 0 && j < boardSize) {
+                        if (privateBoard[i][j] != 'o' && privateBoard[i][j] != 'x' && privateBoard[i][j] != 'm' && privateBoard[i][j] != '#') {
+                            privateBoard[i][j] = '#';
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -95,7 +95,7 @@ int getYCoordinates()
     
 }
 
-bool playerOneTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerOne, Menu &newMenu)
+bool playerOneTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerOne, Menu &newMenu, Player &playerTwo)
 {
     bool hit = 0;
     int posX, posY;
@@ -103,7 +103,7 @@ bool playerOneTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerO
     cout << "Your board" << endl;
     playerOneBoard.printBoard();
     cout << newMenu.getPlayerTwoName() << "'s board" << endl;
-    playerTwoBoard.printBoardForEnemy();
+    playerTwoBoard.printBoardForEnemy(playerTwo);
     cout << "Which cell do you want to shoot?" << endl;
     
     posX = getXCoordinates();
@@ -111,7 +111,7 @@ bool playerOneTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerO
 
     if (posX == -1 || posY == -1)
     {
-        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu, playerTwo);
     }
 
     if (posY > playerTwoBoard.getSize() || posX > playerTwoBoard.getSize())
@@ -119,7 +119,7 @@ bool playerOneTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerO
         cout << "You tried to shoot outside of the board! Try again.";
         this_thread::sleep_for(chrono::milliseconds(3000));
         system("CLS");
-        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu, playerTwo);
     }
 
     if (playerTwoBoard.checkForShips(posX-1, posY-1) == 3)
@@ -132,7 +132,7 @@ bool playerOneTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerO
         cout << "You can't shoot a cell you've already shot at! Try again!" << endl;
         this_thread::sleep_for(chrono::milliseconds(3000));
         system("CLS");
-        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu, playerTwo);
         hit = 0;
     }
     else {
@@ -145,7 +145,7 @@ bool playerOneTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerO
 
     playerTwoBoard.shootForEnemy(posX-1, posY-1);
     cout << "Here's the updated board:" << endl;
-    playerTwoBoard.printBoardForEnemy();
+    playerTwoBoard.printBoardForEnemy(playerTwo);
 
     return hit;
 }
@@ -158,7 +158,7 @@ bool playerTwoTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerO
     cout << "Your board" << endl;
     playerTwoBoard.printBoard();
     cout << newMenu.getPlayerOneName() << "'s board" << endl;
-    playerOneBoard.printBoardForEnemy();
+    playerOneBoard.printBoardForEnemy(playerOne);
     cout << "Which cell do you want to shoot?" << endl;
 
     posX = getXCoordinates();
@@ -184,6 +184,7 @@ bool playerTwoTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerO
     }
     else {
         cout << "You've hit a ship!" << endl;
+        hit = 1;
     }
 
     this_thread::sleep_for(chrono::milliseconds(1000));
@@ -191,7 +192,7 @@ bool playerTwoTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerO
 
     playerOneBoard.shootForEnemy(posX-1, posY-1);
     cout << "Here's the updated board:" << endl;
-    playerOneBoard.printBoardForEnemy();
+    playerOneBoard.printBoardForEnemy(playerOne);
 
     return hit;
 }
@@ -206,16 +207,16 @@ void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoa
     {
         if (currentPlayer == false)
         {
-            playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+            hit = playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu, playerTwo);
         }
         else
         {
-            playerTwoTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+            hit = playerTwoTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
         }
     }
     else 
     {
-        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+        hit = playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu, playerTwo);
     }   
 
     this_thread::sleep_for(chrono::milliseconds(3000));

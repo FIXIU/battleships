@@ -1,7 +1,10 @@
+#pragma once
 #ifndef PLAYER_H
 #define PLAYER_H
 #include <iostream>
-#include "../board/Board.cc"
+#include <vector>
+#include "../board/Board.h"
+#include "../ship/Ship.h"
 
 using namespace std;
 
@@ -12,6 +15,7 @@ private:
     int score;
     //int numOfShips[4]{4, 3, 2, 1}; // This array stores the ammount of n-mast ships left (i = 0 - 1 mast ship, i = 1 - 2 mast ship, ...) TODO: uncomment
     int numOfShips[4]; // TODO: comment
+    vector<Ship> ships;
 public:
     Player(string playerName, int playerScore);
     ~Player();
@@ -20,6 +24,7 @@ public:
     void addPlayerScore(int score);
     int getScore();
     void clearShips();
+    vector<Ship> &getShips();
 };
 
 #endif
