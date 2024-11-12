@@ -1,3 +1,4 @@
+#pragma once
 #include "Ship.h"
 #include "../board/Board.cc"
 
@@ -37,17 +38,19 @@ bool Ship::isSunk()
     }
 }
 
-int Ship::getPosX()
+int Ship::getPosX() const
 {
     return this -> posX;
 }
 
-int Ship::getPosY()
+int Ship::getPosY() const
 {
     return this -> posY;
 }
 
-bool Ship::getOrientation()
+bool Ship::getOrientation() const
 {
     return this -> orientation;
+
+    
 }

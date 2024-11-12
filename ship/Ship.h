@@ -14,9 +14,9 @@ public:
     int cellsShot;
     void shootAt(int posX, int posY, bool hit);
     bool isSunk();
-    int getPosX();
-    int getPosY();
-    bool getOrientation();
+    int getPosX() const;
+    int getPosY() const;
+    bool getOrientation() const;
 };
 
 #endif

@@ -2,6 +2,7 @@
 #define BOARD_H
 #include <iostream>
 #include <vector>
+#include "../ship/Ship.cc"
 
 using namespace std;
 
@@ -12,6 +13,8 @@ private:
     int boardSize;
     vector<vector<char>> privateBoard;
     int numOfShips;
+    vector<Ship> ships;
+    bool isPositionPartOfShip(const Ship& ship, int posX, int posY);
 public:
     Board(int size);
     ~Board();
@@ -24,6 +27,8 @@ public:
     bool allShipsSunk();
     int getSize();
     void clearBoard();
+    void markSunkShip(int posX, int posY, bool orientation, int length);
+    void markAroundSunkShip(int posX, int posY, bool orientation, int length);
 };
 
 #endif

@@ -47,18 +47,18 @@ void Board::printBoard() {
         for (int j = 0; j < boardSize; j++) {
             if (privateBoard[i][j] == '.') {
                  // print ~ for empty space (water)
-                cout << " ~ ";
+                cout << "\033[34m ~ \033[0m";
             } 
             else if (privateBoard[i][j] == 'x')
             {
-                cout << " X "; // print the hit
+                cout << "\033[31m X \033[0m"; // print the hit
             }
             else if (privateBoard[i][j] == 'm')
             {
-                cout << " M "; // print miss
+                cout << "\033[33m M \033[0m"; // print miss
             }
             else {
-                cout << " o "; // print the ship 
+                cout << "\033[32m o \033[0m"; // print the ship 
             }
         }
 
@@ -68,6 +68,7 @@ void Board::printBoard() {
 
 void Board::printBoardForEnemy()
 {
+
     // Print the top row with numbers
     cout << " ";
     for (int i = 0; i < boardSize; i++)
@@ -98,14 +99,14 @@ void Board::printBoardForEnemy()
         for (int j = 0; j < boardSize; j++) {
             if(privateBoard[i][j] == 'x')
             {
-                cout << " X ";
+                cout << "\033[31m X \033[0m";
             }
-            else if(privateBoard[i][j] == 'm')
+            else if(privateBoard[i][j] == 'm' || privateBoard[i][j] == '#')
             {
-                cout << " O ";
+                cout << "\033[33m M \033[0m";
             }
             else {
-                cout << " ~ ";
+                cout << "\033[34m ~ \033[0m";
             }
         }
 
@@ -149,6 +150,8 @@ bool Board::placeShip(int posX, int posY, bool orientation, int length) {
         for (int i = posY; i < posY + length; i++) {
             privateBoard[posX][i] = 'o'; 
         }
+        Ship newShip(length, posX, posY, orientation);
+        ships.push_back(newShip);
         return true;
     } else { // Vertical orientation
         if (posX + length > boardSize) {
@@ -185,6 +188,8 @@ bool Board::placeShip(int posX, int posY, bool orientation, int length) {
         for (int i = posX; i < posX + length; i++) {
             privateBoard[i][posY] = 'o'; 
         }
+        Ship newShip(length, posX, posY, orientation);
+        ships.push_back(newShip);
 
         return true;
     }
@@ -211,24 +216,45 @@ int Board::checkForShips(int posX, int posY)
     {
         return 1;
     }
-    else if (privateBoard[posX][posY] == 'x' || privateBoard[posX][posY] == 'm')
+    else if (privateBoard[posX][posY] == 'x' || privateBoard[posX][posY] == 'm' || privateBoard[posX][posY] == '#')
     {
         return 2;
     }
     else {
         return 3;
     }
-    
 }
 
 void Board::shootForEnemy(int posX, int posY)
 {
     if (privateBoard[posX][posY] == 'o')
     {
-        privateBoard[posX][posY] = 'x'; // Mark the cell as hit (ship)
+        privateBoard[posX][posY] = 'x'; // Mark the cell as hit
+        for (Ship& ship : ships) {
+            if (isPositionPartOfShip(ship, posX, posY)) {
+                ship.shootAt(posX, posY, true);
+                if (ship.isSunk()) {
+                    markSunkShip(ship.getPosX(), ship.getPosY(), ship.getOrientation(), ship.shipLength);
+                    markAroundSunkShip(ship.getPosX(), ship.getPosY(), ship.getOrientation(), ship.shipLength);
+                }
+                break;
+            }
+        }
     }
-    else {
+    else if (privateBoard[posX][posY] == '.' || privateBoard[posX][posY] == '#') {
         privateBoard[posX][posY] = 'm'; // Mark the cell as missed
+    }
+}
+
+bool Board::isPositionPartOfShip(const Ship& ship, int posX, int posY) {
+    int shipX = ship.getPosX();
+    int shipY = ship.getPosY();
+    bool orientation = ship.getOrientation();
+    
+    if (orientation) { // horizontal
+        return posX == shipX && posY >= shipY && posY < shipY + ship.shipLength;
+    } else { // vertical
+        return posY == shipY && posX >= shipX && posX < shipX + ship.shipLength;
     }
 }
 
@@ -263,3 +289,50 @@ void Board::clearBoard()
     }
     
 }
+
+void Board::markSunkShip(int posX, int posY, bool orientation, int length) {
+    if (orientation) { // Horizontal
+        for (int i = posY; i < posY + length; i++) {
+            privateBoard[posX][i] = 'x';
+        }
+    } else { // Vertical
+        for (int i = posX; i < posX + length; i++) {
+            privateBoard[i][posY] = 'x';
+        }
+    }
+}
+
+void Board::markAroundSunkShip(int posX, int posY, bool orientation, int length) {
+    if (orientation) { // Horizontal
+        // Mark cells above and below
+        for (int i = posY - 1; i <= posY + length; i++) {
+            if (i >= 0 && i < boardSize) {
+                if (posX - 1 >= 0 && privateBoard[posX-1][i] == '.') 
+                    privateBoard[posX-1][i] = '#';
+                if (posX + 1 < boardSize && privateBoard[posX+1][i] == '.')
+                    privateBoard[posX+1][i] = '#';
+            }
+        }
+        // Mark cells at the ends
+        if (posY - 1 >= 0 && privateBoard[posX][posY-1] == '.')
+            privateBoard[posX][posY-1] = '#';
+        if (posY + length < boardSize && privateBoard[posX][posY+length] == '.')
+            privateBoard[posX][posY+length] = '#';
+    } else { // Vertical
+        // Mark cells to the left and right
+        for (int i = posX - 1; i <= posX + length; i++) {
+            if (i >= 0 && i < boardSize) {
+                if (posY - 1 >= 0 && privateBoard[i][posY-1] == '.')
+                    privateBoard[i][posY-1] = '#';
+                if (posY + 1 < boardSize && privateBoard[i][posY+1] == '.')
+                    privateBoard[i][posY+1] = '#';
+            }
+        }
+        // Mark cells at the ends
+        if (posX - 1 >= 0 && privateBoard[posX-1][posY] == '.')
+            privateBoard[posX-1][posY] = '#';
+        if (posX + length < boardSize && privateBoard[posX+length][posY] == '.')
+            privateBoard[posX+length][posY] = '#';
+    }
+}
+
