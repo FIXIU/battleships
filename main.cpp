@@ -3,6 +3,7 @@
 #include "board/Board.cc"
 #include "menu/Menu.cc"
 #include "player/Player.cc"
+#include "computer/Computer.cc"
 
 using namespace std;
 
@@ -196,7 +197,34 @@ bool playerTwoTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerO
     return hit;
 }
 
-void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoard, Board &playerTwoBoard, Menu &newMenu, Player &playerOne, Player &playerTwo)
+bool computerTurn(Board &playerOneBoard, Computer &computer, Menu &newMenu)
+{
+    bool hit = 0 ;
+    cout << "Computer's turn!" << endl;
+    cout << "Your board:" << endl;
+    playerOneBoard.printBoard();
+    
+    // Get computer's shot
+    int posX, posY;
+    computer.makeShot(playerOneBoard);
+    
+    // Process the shot
+    if (playerOneBoard.checkForShips(posX, posY) == 1) {
+        cout << "Computer hit your ship at position (" << posX+1 << "," << posY+1 << ")!" << endl;
+        hit = true;
+    } else {
+        cout << "Computer missed at position (" << posX+1 << "," << posY+1 << ")!" << endl;
+    }
+    
+    playerOneBoard.shootForEnemy(posX, posY);
+    
+    this_thread::sleep_for(chrono::milliseconds(2000));
+    system("CLS");
+    
+    return hit;
+}
+
+void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoard, Board &playerTwoBoard, Menu &newMenu, Player &playerOne, Player &playerTwo, Computer &computer, Board &computerBoard)
 {
     int posX, posY, choice;
     bool hit = 0;
@@ -212,30 +240,55 @@ void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoa
         {
             playerTwoTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
         }
+
+        this_thread::sleep_for(chrono::milliseconds(3000));
+        system("CLS");
+        
+        if (playerOneBoard.allShipsSunk() != 1 && playerTwoBoard.allShipsSunk() != 1)
+        {
+            currentPlayer = (hit) ? currentPlayer : !currentPlayer;
+
+            turnNumber++;
+            turn(currentPlayer, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo, computer, computerBoard);
+        }
+
+        if (currentPlayer)
+        {
+            playerTwo.addPlayerScore(1);
+        }
+        else {
+            playerOne.addPlayerScore(1);
+        }
     }
     else 
     {
-        playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+        if (currentPlayer == false) {
+            hit = playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
+        } else {
+            hit = computerTurn(playerOneBoard, computer, newMenu);
+        }
+
+        this_thread::sleep_for(chrono::milliseconds(3000));
+        system("CLS");
+        
+        if (playerOneBoard.allShipsSunk() != 1 && computerBoard.allShipsSunk() != 1)
+        {
+            currentPlayer = (hit) ? currentPlayer : !currentPlayer;
+
+            turnNumber++;
+            turn(currentPlayer, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo, computer, computerBoard);
+        }
+
+        if (currentPlayer)
+        {
+            computer.addPlayerScore(1);
+        }
+        else {
+            playerOne.addPlayerScore(1);
+        }
     }   
 
-    this_thread::sleep_for(chrono::milliseconds(3000));
-    system("CLS");
     
-    if (playerOneBoard.allShipsSunk() != 1 && playerTwoBoard.allShipsSunk() != 1)
-    {
-        currentPlayer = (hit) ? currentPlayer : !currentPlayer;
-
-        turnNumber++;
-        turn(currentPlayer, turnNumber, gameMode, playerOneBoard, playerTwoBoard, newMenu, playerOne, playerTwo);
-    }
-
-    if (currentPlayer)
-    {
-        playerTwo.addPlayerScore(1);
-    }
-    else {
-        playerOne.addPlayerScore(1);
-    }
     
 }
 
@@ -248,7 +301,72 @@ void clearAll(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &playe
     playerTwoBoard.clearBoard();
 }
 
-void multiPlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &playerOneBoard, Board &playerTwoBoard)
+void singlePlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &playerOneBoard, Board &playerTwoBoard, Board &computerBoard, Computer &computer)
+{
+    int onePreviousScore, computerPreviousScore, winnerScore;
+    string winnerName;
+
+    system("CLS");
+    
+    playerOne.placeShips(playerOneBoard);
+    computer.placeShipsRandomly(computerBoard);
+
+    turn(0, 1, 0, playerOneBoard, playerTwoBoard, mainMenu, playerOne, playerTwo, computer, computerBoard);
+
+    char Yn;
+
+    if (onePreviousScore < playerOne.getScore())
+    {
+        winnerName = playerOne.getName();
+        winnerScore = playerOne.getScore();
+    }
+    else {
+        winnerName = playerTwo.getName();
+        winnerScore = playerTwo.getScore();
+    }
+    
+    
+
+    cout << "Congratulations " << winnerName << " you have won this game!" << endl;
+    cout << "Your score is now: " << winnerScore + 1;
+
+    this_thread::sleep_for(chrono::milliseconds(3000));
+    
+    bool f = 0;
+
+    onePreviousScore = playerOne.getScore();
+    computerPreviousScore = computer.getScore();
+
+    while (f == 0)
+    {
+        system("CLS");
+
+        cout << playerOne.getName() << " score: " << playerOne.getScore() << endl;
+        cout << playerTwo.getName() << " score: " << playerTwo.getScore() << endl;
+
+        cout << "\nDo you want to play again? (Y/N): ";
+        cin >> Yn;
+
+        clearAll(mainMenu, playerOne, playerTwo, playerOneBoard, playerTwoBoard);
+
+        if (Yn == 'Y' || Yn == 'y')
+        {
+            singlePlayer(mainMenu, playerOne, playerTwo, playerOneBoard, playerTwoBoard, computerBoard, computer);
+            f = 1;
+        }
+        else if (Yn == 'N' || Yn == 'n')
+        {
+            f = 1;
+        }
+        else {
+            cout << "Invalid input. Please enter Y or N.";
+            this_thread::sleep_for(chrono::milliseconds(2000));
+        }
+    }
+    system("CLS");
+}
+
+void multiPlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &playerOneBoard, Board &playerTwoBoard, Computer &computer, Board &computerBoard)
 {
     int onePreviousScore, twoPreviousScore, winnerScore;
     string winnerName;
@@ -260,7 +378,7 @@ void multiPlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &pl
     playerOne.placeShips(playerOneBoard);
     playerTwo.placeShips(playerTwoBoard);
 
-    turn(0, 1, 0, playerOneBoard, playerTwoBoard, mainMenu, playerOne, playerTwo);
+    turn(0, 1, 0, playerOneBoard, playerTwoBoard, mainMenu, playerOne, playerTwo, computer, computerBoard);
 
     char Yn;
 
@@ -300,7 +418,7 @@ void multiPlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &pl
 
         if (Yn == 'Y' || Yn == 'y')
         {
-            multiPlayer(mainMenu, playerOne, playerTwo, playerOneBoard, playerTwoBoard);
+            multiPlayer(mainMenu, playerOne, playerTwo, playerOneBoard, playerTwoBoard, computer, computerBoard);
             f = 1;
         }
         else if (Yn == 'N' || Yn == 'n')
@@ -343,6 +461,8 @@ void game(Menu &mainMenu)
         // Creating the board objects
         Board playerOneBoard(10);
         Board playerTwoBoard(10);
+        Computer computer(10); // Sadly I have to create the computer object here
+        Board computerBoard(10); // Sadly I have to create the computer board object here
 
         playerOneBoard.placeShip(1-1, 1-1, 1, 1);
         playerOneBoard.placeShip(1-1, 3-1, 1, 1);
@@ -406,10 +526,35 @@ void game(Menu &mainMenu)
         playerTwoBoard.shootForEnemy(3-1, 9-1);
         playerTwoBoard.shootForEnemy(3-1, 10-1);
 
-        multiPlayer(mainMenu, playerOne, playerTwo, playerOneBoard, playerTwoBoard);
+        multiPlayer(mainMenu, playerOne, playerTwo, playerOneBoard, playerTwoBoard, computer, computerBoard);
     }
     else {
-        //TODO: Single player (vs computer)
+        Player playerOne(mainMenu.getPlayerOneName(), 0);
+        Board playerOneBoard(10);
+        Board computerBoard(10);
+        Computer computer(10);
+
+        playerOneBoard.placeShip(1-1, 1-1, 1, 1);
+        playerOneBoard.placeShip(1-1, 3-1, 1, 1);
+        playerOneBoard.placeShip(1-1, 5-1, 1, 1);
+        playerOneBoard.placeShip(1-1, 7-1, 1, 1);
+        
+        playerOneBoard.placeShip(1-1, 9-1, 1, 2);
+        playerOneBoard.placeShip(3-1, 1-1, 1, 2);
+        playerOneBoard.placeShip(3-1, 4-1, 1, 2);
+
+        playerOneBoard.placeShip(5-1, 1-1, 1, 3);
+        playerOneBoard.placeShip(5-1, 5-1, 1, 3);
+        
+        playerOneBoard.placeShip(3-1, 7-1, 1, 4);
+
+        playerOne.placeShips(playerOneBoard);
+
+        computer.placeShipsRandomly(computerBoard);
+
+        turn(0, 1, 1, playerOneBoard, computerBoard, mainMenu, playerOne, playerOne, computer, computerBoard);
+    
+        singlePlayer(mainMenu, playerOne, playerOne, playerOneBoard, computerBoard, computerBoard, computer);
     }
     
     game(mainMenu);
