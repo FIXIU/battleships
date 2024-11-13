@@ -19,7 +19,7 @@ Menu::~Menu()
 
 void Menu::showMenu()
 {
-    cout << "Welcome to Battleships!" << endl; // TODO: input some fancy ass ASCII art here
+    cout << "Welcome to Battleships!" << endl;
     cout << "Make your selection:" << endl;
     cout << "1. Play a game of Battleships against another human (hotseat)" << endl;
     cout << "2. Play a game of Battleships against the computer" << endl;
@@ -56,7 +56,6 @@ void Menu::showMenu()
     switch (choice)
     {
         case 1:
-            // TODO: HOTSEAT!!!
             this -> gameMode = 0;
             cout << "Enter the first player's name: ";
             cin >> this -> playerOneName;
@@ -64,7 +63,6 @@ void Menu::showMenu()
             cin >> this -> playerTwoName;
             break;
         case 2:
-            // TODO: VS COMPUTER!!!!
             this -> gameMode = 1;
             cout << "Enter the player's name: ";
             cin >> this -> playerOneName;
@@ -89,7 +87,7 @@ void Menu::showMenu()
 void Menu::credits()
 {
     cout << "This game was created by fixiu" << endl;
-    cout << "pssst... input '5' as the choice in the menu" << endl; // TODO: REMOVE THIS
+    cout << "pssst... input '5' as the choice in the menu" << endl;
     this_thread::sleep_for(chrono::milliseconds(3000));
     showMenu();
 }

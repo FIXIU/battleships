@@ -16,7 +16,6 @@ void createBoards(bool gameMode, Board &playerOneBoard, Board &playerTwoBoard)
     }
     else {
         playerOneBoard = Board(10);
-        // Assuming computerBoard is not needed to be returned
     }
 }
 
@@ -29,7 +28,6 @@ void createPlayers(bool gameMode, Player &playerOne, Player &playerTwo, Menu &me
     }
     else {
         playerOne = Player(menu.getPlayerOneName(), 0);
-        // Assuming computerPlayer is not needed to be returned
     }
 }
 
@@ -66,7 +64,7 @@ void displayBoards(Board &playerBoard, Board &enemyBoard, string enemyName, bool
     cout << "Your board" << endl;
     playerBoard.printBoard();
     cout << enemyName << "'s board" << endl;
-    enemyBoard.printBoard();// TODO: UNCOMMMENT ForEnemy();
+    enemyBoard.printBoardForEnemy();
 }
 
 bool playerOneTurn(Board &playerOneBoard, Board &playerTwoBoard, Player &playerOne, Menu &newMenu)
@@ -345,7 +343,7 @@ void multiPlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &pl
         }
         else {
             cout << "Invalid input. Please enter Y or N.";
-            this_thread::sleep_for(chrono::milliseconds(2000)); // TODO: maybe make this a function, and change it up a bit
+            this_thread::sleep_for(chrono::milliseconds(2000));
         }
     }
     system("CLS");
@@ -435,37 +433,8 @@ void game(Menu &mainMenu)
 int main()
 {
     Menu mainMenu;
-
     game(mainMenu);
-
-
     return 0;
-
-    // Board playerOneBoard(10);
-    // Board playerTwoBoard(10);
-    // bool currentPlayer = 0;
-
-    // // Board newBoard(10);
-    // // newBoard.printBoard();
-    // // newBoard.placeShip(5/* the number the user gives + 1 */, 3/* the number the user gives + 1 */, true, 3);
-    // // newBoard.placeShip(4/* the number the user gives + 1 (posY)*/, 6/* the number the user gives + 1 (posX) */, true, 3);
-    // // newBoard.placeShip(3/* the number the user gives + 1 (posY)*/, 3/* the number the user gives + 1 (posX) */, true, 3);
-    // // newBoard.printBoard();
-
-    // Menu newMenu;
-    // newMenu.showMenu();
-
-    // bool gameMode = newMenu.getGameMode();
-
-    // Player playerOne(newMenu.getPlayerOneName(), 0);
-    // Player playerTwo(newMenu.getPlayerTwoName(), 0);
-
-    // createBoards(gameMode, playerOneBoard, playerTwoBoard);
-    // createPlayers(gameMode, playerOne, playerTwo, newMenu);
-
-    
-    // playerOne.placeShips(playerOneBoard);
-
 
     system("PAUSE");
 }

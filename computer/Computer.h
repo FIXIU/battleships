@@ -2,17 +2,17 @@
 #define COMPUTER_H
 #include "../board/Board.cc"
 #include <vector>
-#include <cstdlib>  // for rand() and srand()
-#include <ctime>    // for time()
+#include <cstdlib> // random
+#include <ctime>
 
 using namespace std;
 
 class Computer {
 private:
-    vector<vector<bool>> shotGrid;  // Tracks where computer has shot
-    int lastHitX;                   // Stores last successful hit X
-    int lastHitY;                   // Stores last successful hit Y
-    bool huntMode;                  // True when hunting a ship
+    vector<vector<bool>> shotGrid;
+    int lastHitX;
+    int lastHitY;
+    bool huntMode;                  // True when hunting a ship (when a ship is hit and we are searching for the rest of it)
     int boardSize;
     int computerScore;
 

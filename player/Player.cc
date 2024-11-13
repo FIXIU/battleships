@@ -15,7 +15,7 @@ Player::Player(string playerName, int playerScore)
 
     for (int i = 0; i < 4; i++)
     {
-        this -> numOfShips[i] = 0;//4-i;
+        this -> numOfShips[i] = 4-i;
     }
     
 }
@@ -135,7 +135,7 @@ void Player::placeShips(Board& playerBoard)
 
     if (numOfShips[0] > 0 || numOfShips[1] > 0 || numOfShips[2] > 0 || numOfShips[3] > 0)
     {
-        cout << name << " place your ships!" << endl; // TODO: decide if this needs removing (incase we don't want to print this whenever this function is called (as it is recurrent))
+        cout << name << " place your ships!" << endl;
 
         playerBoard.printBoard();
 
@@ -231,7 +231,7 @@ void Player::placeShips(Board& playerBoard)
                 }
             }
             else {
-                this_thread::sleep_for(chrono::milliseconds(3000)); // TODO: WORK ON THIS
+                this_thread::sleep_for(chrono::milliseconds(3000));
             }
         }
         else {
@@ -243,7 +243,7 @@ void Player::placeShips(Board& playerBoard)
     }
     else {
         cout << "You have placed all your ships!" << endl;
-        this_thread::sleep_for(chrono::milliseconds(3000)); // TODO: check if this works
+        this_thread::sleep_for(chrono::milliseconds(3000));
         system("CLS");
     }
 }
