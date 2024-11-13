@@ -3,6 +3,7 @@
 #include "../player/Player.cc"
 #include <iostream>
 #include <cctype>
+#include <limits>
 
 using namespace std;
 
@@ -25,14 +26,31 @@ void Menu::showMenu()
     cout << "3. Credits" << endl;
     cout << "4. Quit" << endl;
 
-    int choice;
+    int choice = 0;
     string input;
     
     cout << "\nPick one of the options: ";
     cin >> input;
+    cin.clear(); // Resets any error flags on cin (like when invalid input happens)
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear everything until newline
     
     if (isValidNumber(input)) {
-            choice = stringToInt(input);
+        choice = stringToInt(input);
+        if (choice < 1 || choice > 5) {
+            cout << "Invalid choice. Please try again." << endl;
+            this_thread::sleep_for(chrono::milliseconds(3000));
+            system("CLS");
+            showMenu();
+            return;
+        }
+    }
+    else 
+    {
+        cout << "Invalid input. Please enter a number." << endl;
+        this_thread::sleep_for(chrono::milliseconds(3000));
+        system("CLS");
+        showMenu();
+        return;
     }
 
     switch (choice)
@@ -58,16 +76,10 @@ void Menu::showMenu()
             this -> quit = 1;
             break;
         case 5:
-            cout << "w9DNf3GH2US@Js7 https://www.youtube.com/watch?v=dQw4w9WgXcQ" << endl;
-            break;
-
-        default:
-            cout << "Invalid choice. Please try again." << endl;
-            
-            this_thread::sleep_for(chrono::milliseconds(3000));
+            cout << "please head over to this website -> https://www.youtube.com/watch?v=dQw4w9WgXcQ" << endl;
+            this_thread::sleep_for(chrono::milliseconds(5000));
             system("CLS");
-
-            showMenu();
+            this -> quit = 1;
             break;
     }
     this_thread::sleep_for(chrono::milliseconds(500));
@@ -77,8 +89,9 @@ void Menu::showMenu()
 void Menu::credits()
 {
     cout << "This game was created by fixiu" << endl;
-    cout << "dsadasdas" << endl;
-    cout << "pssst... input w9DNf3GH2US@Js7 at the choice in the menu" << endl; // TODO: REMOVE THIS
+    cout << "pssst... input '5' as the choice in the menu" << endl; // TODO: REMOVE THIS
+    this_thread::sleep_for(chrono::milliseconds(3000));
+    showMenu();
 }
 
 bool Menu::getGameMode()

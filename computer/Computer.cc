@@ -27,31 +27,37 @@ void Computer::getRandomShot(int& x, int& y) {
     do {
         x = rand() % boardSize;
         y = rand() % boardSize;
-        canShot = isValidShot(x, y);
-        if (shotGrid[x+1][y] == 1 || shotGrid[x-1][y] == 1 || shotGrid[x][y+1] == 1 || shotGrid[x][y-1] == 1)
-        {
-            canShot = 0;
-        }
+        // Only allow shots on checkerboard pattern
+        canShot = isValidShot(x, y) && ((x + y) % 2 == 0);
     } while (!canShot);
 }
 
 void Computer::getAdjacentShot(int& x, int& y) {
-    // Try up, right, down, left from last hit
+    // Only try cardinal directions (no diagonals)
     int directions[4][2] = {{-1,0}, {0,1}, {1,0}, {0,-1}};
+    vector<int> availableDirs;
     
-    // Try 10 times to find a valid adjacent shot
-    for (int tries = 0; tries < 10; tries++) {
-        int dir = rand() % 4;  // Random direction 0-3
-        x = lastHitX + directions[dir][0];
-        y = lastHitY + directions[dir][1];
+    // Check which directions are valid
+    for (int dir = 0; dir < 4; dir++) {
+        int newX = lastHitX + directions[dir][0];
+        int newY = lastHitY + directions[dir][1];
         
-        if (isValidShot(x, y)) {
-            return;
+        if (newX >= 0 && newX < boardSize && newY >= 0 && newY < boardSize && !shotGrid[newX][newY]) {
+            availableDirs.push_back(dir);
         }
     }
     
-    // If we couldn't find an adjacent shot, just get a random one
-    getRandomShot(x, y);
+    // If no valid directions, get random shot and disable hunt mode
+    if (availableDirs.empty()) {
+        getRandomShot(x, y);
+        huntMode = false;
+        return;
+    }
+    
+    // Pick a random valid direction
+    int chosenDir = availableDirs[rand() % availableDirs.size()];
+    x = lastHitX + directions[chosenDir][0];
+    y = lastHitY + directions[chosenDir][1];
 }
 
 void Computer::makeShot(Board& enemyBoard) {
@@ -64,41 +70,50 @@ void Computer::makeShot(Board& enemyBoard) {
         getRandomShot(x, y);
     }
     
+    // Store the coordinates for reference
+    lastHitX = x;
+    lastHitY = y;
+    
     // Mark this position as shot
-    shotGrid[x][y] = 1;
+    shotGrid[x][y] = true;
     
     // Take the shot and process the result
     bool isHit = (enemyBoard.checkForShips(x, y) == 1);
     enemyBoard.shootForEnemy(x, y);
     
-    // Update hunting status
+    // Update hunting status and display result
+
+    char posXChar = 'a' + x;
     if (isHit) {
-        huntMode = 1;
-        lastHitX = x;
-        lastHitY = y;
-        cout << "Computer hit your ship at position (" << x+1 << "," << y+1 << ")!" << endl;
+        huntMode = true;
+        cout << "Computer hit your ship at position (" << posXChar << "," << y+1 << ")!" << endl;
     } else {
-        cout << "Computer missed at position (" << x+1 << "," << y+1 << ")." << endl;
+        huntMode = false;  // Reset hunt mode on miss
+        cout << "Computer missed at position (" << posXChar << "," << y+1 << ")." << endl;
     }
 }
 
 void Computer::placeShipsRandomly(Board& board) {
-    int ships[] = {1, 2, 3, 4};  // Number of ships: [4-mast, 3-mast, 2-mast, 1-mast]
+    board.setSilentMode(true);  // Turn off error messages
+    
+    int ships[] = {1, 2, 3, 4};  // Number of ships of each length
     
     for (int length = 4; length >= 1; length--) {
         for (int i = 0; i < ships[4-length]; i++) {
-            bool placed = 0;
+            bool placed = false;
             while (!placed) {
                 int x = rand() % board.getSize();
                 int y = rand() % board.getSize();
-                bool orientation = rand() % 2;  // 0 for vertical, 1 for horizontal
+                bool orientation = rand() % 2;
                 
-                if (board.placeShip(x, y, orientation, length)) { //TODO: THE COMPUTER PRINTS 1, 69 idk why fix this plz
-                    placed = 1;
+                if (board.placeShip(x, y, orientation, length)) {
+                    placed = true;
                 }
             }
         }
     }
+    
+    board.setSilentMode(false);  // Turn error messages back on
 }
 
 void Computer::addPlayerScore(int score) {
@@ -108,3 +123,14 @@ void Computer::addPlayerScore(int score) {
 int Computer::getScore() {
     return this -> computerScore;
 }
+
+int Computer::getLastHitX()
+{
+    return this -> lastHitX;
+}
+
+int Computer::getLastHitY()
+{
+    return this -> lastHitY;
+}
+

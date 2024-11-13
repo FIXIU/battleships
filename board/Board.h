@@ -15,6 +15,8 @@ private:
     int numOfShips;
     vector<Ship> ships;
     bool isPositionPartOfShip(const Ship& ship, int posX, int posY);
+    bool silentMode = false;
+    bool canPlaceShip(int posX, int posY, bool orientation, int length);
 public:
     Board(int size);
     ~Board();
@@ -29,6 +31,8 @@ public:
     void clearBoard();
     void markSunkShip(int posX, int posY, bool orientation, int length);
     void markAroundSunkShip(int posX, int posY, bool orientation, int length);
+    void setSilentMode(bool mode);
+    bool getSilentMode();
 };
 
 #endif

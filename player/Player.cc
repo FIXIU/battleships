@@ -4,6 +4,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <limits>
 
 using namespace std;
 
@@ -12,15 +13,23 @@ Player::Player(string playerName, int playerScore)
     this -> name = playerName;
     this -> score = playerScore;
 
-    for (int i = 3; i >= 0; i--)
+    for (int i = 0; i < 4; i++)
     {
-        this -> numOfShips[i] = 0; // TODO: change to this -> numOfShips[i] = i+1;
+        this -> numOfShips[i] = 0;//4-i;
     }
     
 }
 
 Player::~Player()
 {
+}
+
+int stringToInt(const string& str) {
+    int number = 0;
+    for (char c : str) {
+        number = number * 10 + (c - '0'); // Convert char to int and add to total
+    }
+    return number;
 }
 
 bool isValidNumber(const string& str) {
@@ -30,12 +39,91 @@ bool isValidNumber(const string& str) {
     return true;
 }
 
-int stringToInt(const string& str) {
-    int number = 0;
-    for (char c : str) {
-        number = number * 10 + (c - '0'); // Convert char to int and add to total
+int translateInput(string input)
+{
+    if (isValidNumber(input)) {
+        return stringToInt(input);
     }
-    return number;
+    else {
+        return -1;
+    }
+}
+
+int getXCoordinates()
+{
+    string input;
+    int posX;
+    bool rightInput = 0;
+
+    cout << "\tRow (a-j): ";
+    cin >> input;
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    if (input.length() == 1) {
+        if (isalpha(input[0])) {
+            char inputChar = tolower(input[0]);
+            if (inputChar >= 'a' && inputChar <= 'j') {
+                posX = inputChar - 'a' + 1;
+                return posX;
+            }
+        } else if (isdigit(input[0])) {
+            int num = input[0] - '0';
+            if (num >= 1 && num <= 9) {
+                return num;
+            }
+        }
+    }
+    
+    cout << "Invalid input. Please enter a letter between a and j or number between 1-9." << endl;
+    this_thread::sleep_for(chrono::milliseconds(3000));
+    system("CLS");
+    return getXCoordinates();
+}
+
+int getYCoordinates()
+{
+    string input;
+    int posY;
+
+    cout << "\tColumn (1-10): ";
+    cin >> input;
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    if (isValidNumber(input)) {
+        posY = translateInput(input);
+        if (posY >= 1 && posY <= 10) {
+            return posY;
+        }
+    }
+    
+    cout << "Invalid input. Please enter a number between 1 and 10." << endl;
+    this_thread::sleep_for(chrono::milliseconds(3000));
+    system("CLS");
+    return getYCoordinates();
+}
+
+void getOrientation(char& orientation) {
+    string input;
+    cout << "\tOrientation (N, E, S, W): ";
+    cin >> input;
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (input.length() == 1) {
+        orientation = tolower(input[0]);
+        if (orientation != 'n' && orientation != 'e' && 
+            orientation != 's' && orientation != 'w') {
+            cout << "Invalid orientation. Please try again." << endl;
+            this_thread::sleep_for(chrono::milliseconds(3000));
+            getOrientation(orientation);
+        }
+    } else {
+        cout << "Invalid input. Please enter a single character." << endl;
+        this_thread::sleep_for(chrono::milliseconds(3000));
+        getOrientation(orientation);
+    }
 }
 
 void Player::placeShips(Board& playerBoard)
@@ -56,7 +144,7 @@ void Player::placeShips(Board& playerBoard)
         cout << "2 mast ship (" << this -> numOfShips[1] << " left)" << endl;
         cout << "3 mast ship (" << this -> numOfShips[2] << " left)" << endl;
         cout << "4 mast ship (" << this -> numOfShips[3] << " left)" << endl;
-        cout << "Input the ammount of mast ship you'd like to place: ";
+        cout << "Input the length of the ship you'd like to place: ";
         cin >> input;
         
         if (isValidNumber(input)) {
@@ -76,22 +164,19 @@ void Player::placeShips(Board& playerBoard)
             switch (choice)
             {
             case 1:
-                cout << "select the X position you'd like to place your ship at: ";
-                cin >> posX;
-                cout << "select the Y position you'd like to place your ship at: ";
-                cin >> posY;
+                cout << "Place your ship: " << endl;
+                posX = getXCoordinates();
+                posY = getYCoordinates();
 
                 break;
 
             case 2:
             case 3:
             case 4:
-                cout << "select the X position you'd like to place your ship at: ";
-                cin >> posX;
-                cout << "select the Y position you'd like to place your ship at: ";
-                cin >> posY;
-                cout << "select the orientation you'd like your ship to face (N, E, S, W): ";
-                cin >> orientation;
+                cout << "Place your ship: " << endl;
+                posX = getXCoordinates();
+                posY = getYCoordinates();
+                getOrientation(orientation);
                 if (orientation == 'N' || orientation == 'n')
                 {
                     orientationToF = 0;
@@ -130,13 +215,19 @@ void Player::placeShips(Board& playerBoard)
                 playerBoard.printBoard();
 
                 cout << "Is this where you wanted to place your ship? (Y/n)";
-                cin >> Yn;
-                if (Yn != 'Y' && Yn != 'y')
-                {
+                cin >> input;
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                if (input.length() == 1) {
+                    char Yn = tolower(input[0]);
+                    if (Yn != 'y') {
+                        playerBoard.unplaceShip(posX-1, posY-1, orientationToF, length);
+                    } else {
+                        numOfShips[choice-1] -= 1;
+                    }
+                } else {
                     playerBoard.unplaceShip(posX-1, posY-1, orientationToF, length);
-                }
-                else {
-                    numOfShips[choice-1] -= 1;
                 }
             }
             else {
@@ -174,8 +265,8 @@ int Player::getScore()
 
 void Player::clearShips()
 {
-    for (int i = 3; i >= 0; i--)
+    for (int i = 0; i < 4; i++)
     {
-        this -> numOfShips[i] = i+1; // TODO: change to this -> numOfShips[i] = i+1;
+        this -> numOfShips[i] = 4-i;
     }
 }

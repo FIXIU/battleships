@@ -26,6 +26,8 @@ public:
     void getRandomShot(int& x, int& y);
     void getAdjacentShot(int& x, int& y);
     int getScore();
+    int getLastHitX();
+    int getLastHitY();
 };
 
 #endif
