@@ -2,7 +2,7 @@
 
 Computer::Computer(int size) {
     boardSize = size;
-    huntMode = false;
+    huntMode = 0;
     lastHitX = -1;
     lastHitY = -1;
     
@@ -10,7 +10,7 @@ Computer::Computer(int size) {
     srand(time(0));
     
     // Initialize shot grid with false (no shots taken)
-    shotGrid.resize(size, vector<bool>(size, false));
+    shotGrid.resize(size, vector<bool>(size, 0));
 }
 
 Computer::~Computer() {}
@@ -23,10 +23,16 @@ bool Computer::isValidShot(int x, int y) {
 }
 
 void Computer::getRandomShot(int& x, int& y) {
+    bool canShot = 0;
     do {
         x = rand() % boardSize;
         y = rand() % boardSize;
-    } while (!isValidShot(x, y));
+        canShot = isValidShot(x, y);
+        if (shotGrid[x+1][y] == 1 || shotGrid[x-1][y] == 1 || shotGrid[x][y+1] == 1 || shotGrid[x][y-1] == 1)
+        {
+            canShot = 0;
+        }
+    } while (!canShot);
 }
 
 void Computer::getAdjacentShot(int& x, int& y) {
@@ -59,7 +65,7 @@ void Computer::makeShot(Board& enemyBoard) {
     }
     
     // Mark this position as shot
-    shotGrid[x][y] = true;
+    shotGrid[x][y] = 1;
     
     // Take the shot and process the result
     bool isHit = (enemyBoard.checkForShips(x, y) == 1);
@@ -67,7 +73,7 @@ void Computer::makeShot(Board& enemyBoard) {
     
     // Update hunting status
     if (isHit) {
-        huntMode = true;
+        huntMode = 1;
         lastHitX = x;
         lastHitY = y;
         cout << "Computer hit your ship at position (" << x+1 << "," << y+1 << ")!" << endl;

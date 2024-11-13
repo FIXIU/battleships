@@ -78,7 +78,7 @@ void Menu::credits()
 {
     cout << "This game was created by fixiu" << endl;
     cout << "dsadasdas" << endl;
-    cout << "pssst... input \'5\' into the selection menu at the start :D" << endl;
+    cout << "pssst... input w9DNf3GH2US@Js7 at the choice in the menu" << endl; // TODO: REMOVE THIS
 }
 
 bool Menu::getGameMode()

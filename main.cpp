@@ -256,15 +256,19 @@ void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoa
         {
             playerTwo.addPlayerScore(1);
         }
-        else {
+        else 
+        {
             playerOne.addPlayerScore(1);
         }
     }
     else 
     {
-        if (currentPlayer == false) {
+        if (currentPlayer == false) 
+        {
             hit = playerOneTurn(playerOneBoard, playerTwoBoard, playerOne, newMenu);
-        } else {
+        } 
+        else 
+        {
             hit = computerTurn(playerOneBoard, computer, newMenu);
         }
 
@@ -283,7 +287,8 @@ void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoa
         {
             computer.addPlayerScore(1);
         }
-        else {
+        else 
+        {
             playerOne.addPlayerScore(1);
         }
     }   
@@ -311,7 +316,7 @@ void singlePlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &p
     playerOne.placeShips(playerOneBoard);
     computer.placeShipsRandomly(computerBoard);
 
-    turn(0, 1, 0, playerOneBoard, playerTwoBoard, mainMenu, playerOne, playerTwo, computer, computerBoard);
+    turn(0, 1, 1, playerOneBoard, playerTwoBoard, mainMenu, playerOne, playerTwo, computer, computerBoard);
 
     char Yn;
 

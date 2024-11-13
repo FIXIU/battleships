@@ -40,10 +40,6 @@ void Board::printBoard() {
         char letter = 'a' + i; // set the letter according to the number index
         cout << letter; // print the letter index
 
-//
-//                      TODO: FIX THIS MADNESS (most wanted outcome: the water being colored in the windows cmd) !!!!!!!! THE COLOR MESSES WITH THE COMPILER !!!!!!!
-//
-
         for (int j = 0; j < boardSize; j++) {
             if (privateBoard[i][j] == '.') {
                  // print ~ for empty space (water)
@@ -91,10 +87,6 @@ void Board::printBoardForEnemy()
     for (int i = 0; i < boardSize; i++) {
         char letter = 'a' + i; // set the letter according to the number index
         cout << letter; // print the letter index
-
-//
-//                      TODO: FIX THIS MADNESS (most wanted outcome: the water being colored in the windows cmd) !!!!!!!! THE COLOR MESSES WITH THE COMPILER !!!!!!!
-//
 
         for (int j = 0; j < boardSize; j++) {
             if(privateBoard[i][j] == 'x')
