@@ -39,7 +39,7 @@ bool processShot(Board &targetBoard, int posX, int posY) {
     }
     else if (targetBoard.checkForShips(posX-1, posY-1) == 2) {
         cout << "You can't shoot a cell you've already shot at! Try again!" << endl;
-        return false;
+        return true;
     }
     else {
         cout << "You've hit a ship!" << endl;
@@ -206,6 +206,10 @@ void turn(bool currentPlayer, int turnNumber, bool gameMode, Board &playerOneBoa
     if (playerOneBoard.allShipsSunk() != 1 && targetBoard.allShipsSunk() != 1) {
         currentPlayer = (hit) ? currentPlayer : !currentPlayer;
         turnNumber++;
+        if (!hit)
+        {
+            swapSeats();
+        }
         turn(currentPlayer, turnNumber, gameMode, playerOneBoard, playerTwoBoard, 
              newMenu, playerOne, playerTwo, computer, computerBoard);
     }
@@ -224,7 +228,9 @@ void clearAll(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &playe
 
 void singlePlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &playerOneBoard, Board &playerTwoBoard, Board &computerBoard, Computer &computer)
 {
-    int onePreviousScore, computerPreviousScore, winnerScore;
+    int onePreviousScore = playerOne.getScore();
+    int computerPreviousScore = computer.getScore();
+    int winnerScore;
     string winnerName;
 
     system("CLS");
@@ -249,7 +255,7 @@ void singlePlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &p
     
 
     cout << "Congratulations " << winnerName << " you have won this game!" << endl;
-    cout << "Your score is now: " << winnerScore + 1;
+    cout << "Your score is now: " << winnerScore;
 
     this_thread::sleep_for(chrono::milliseconds(3000));
     
@@ -294,7 +300,9 @@ void multiPlayer(Menu &mainMenu, Player &playerOne, Player &playerTwo, Board &pl
 
     system("CLS");
     playerOne.placeShips(playerOneBoard);
+    swapSeats();
     playerTwo.placeShips(playerTwoBoard);
+    swapSeats();
 
     turn(0, 1, 0, playerOneBoard, playerTwoBoard, mainMenu, playerOne, playerTwo, computer, computerBoard);
 
@@ -409,6 +417,53 @@ void game(Menu &mainMenu)
         Board playerTwoBoard(10);
         Computer computer(10); // Sadly I have to create the computer object here
         Board computerBoard(10); // Sadly I have to create the computer board object here
+
+        playerOneBoard.placeShip(1-1, 1-1, 1, 1);
+        playerOneBoard.placeShip(1-1, 3-1, 1, 1);
+        playerOneBoard.placeShip(1-1, 5-1, 1, 1);
+        playerOneBoard.placeShip(1-1, 7-1, 1, 1);
+        
+        playerOneBoard.placeShip(1-1, 9-1, 1, 2);
+        playerOneBoard.placeShip(3-1, 1-1, 1, 2);
+        playerOneBoard.placeShip(3-1, 4-1, 1, 2);
+        playerOneBoard.placeShip(5-1, 1-1, 1, 3);
+        playerOneBoard.placeShip(5-1, 5-1, 1, 3);
+        
+        playerOneBoard.placeShip(3-1, 7-1, 1, 4);
+        playerTwoBoard.placeShip(1-1, 1-1, 1, 1);
+        playerTwoBoard.placeShip(1-1, 3-1, 1, 1);
+        playerTwoBoard.placeShip(1-1, 5-1, 1, 1);
+        playerTwoBoard.placeShip(1-1, 7-1, 1, 1);
+        
+        playerTwoBoard.placeShip(1-1, 9-1, 1, 2);
+        playerTwoBoard.placeShip(3-1, 1-1, 1, 2);
+        playerTwoBoard.placeShip(3-1, 4-1, 1, 2);
+        playerTwoBoard.placeShip(5-1, 1-1, 1, 3);
+        playerTwoBoard.placeShip(5-1, 5-1, 1, 3);
+        
+        playerTwoBoard.placeShip(3-1, 7-1, 1, 4);
+        playerTwoBoard.shootForEnemy(1-1, 3-1);
+        playerTwoBoard.shootForEnemy(1-1, 5-1);
+        playerTwoBoard.shootForEnemy(1-1, 7-1);
+        
+        playerTwoBoard.shootForEnemy(1-1, 9-1);
+        playerTwoBoard.shootForEnemy(1-1, 10-1);
+        playerTwoBoard.shootForEnemy(3-1, 1-1);
+        playerTwoBoard.shootForEnemy(3-1, 2-1);
+        
+        playerTwoBoard.shootForEnemy(3-1, 4-1);
+        playerTwoBoard.shootForEnemy(3-1, 5-1);
+        playerTwoBoard.shootForEnemy(5-1, 1-1);
+        playerTwoBoard.shootForEnemy(5-1, 2-1);
+        playerTwoBoard.shootForEnemy(5-1, 3-1);
+        playerTwoBoard.shootForEnemy(5-1, 5-1);
+        playerTwoBoard.shootForEnemy(5-1, 6-1);
+        playerTwoBoard.shootForEnemy(5-1, 7-1);
+        
+        playerTwoBoard.shootForEnemy(3-1, 7-1);
+        playerTwoBoard.shootForEnemy(3-1, 8-1);
+        playerTwoBoard.shootForEnemy(3-1, 9-1);
+        playerTwoBoard.shootForEnemy(3-1, 10-1);
 
         multiPlayer(mainMenu, playerOne, playerTwo, playerOneBoard, playerTwoBoard, computer, computerBoard);
     }

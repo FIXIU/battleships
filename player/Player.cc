@@ -15,7 +15,7 @@ Player::Player(string playerName, int playerScore)
 
     for (int i = 0; i < 4; i++)
     {
-        this -> numOfShips[i] = 4-i;
+        this -> numOfShips[i] = 0;//4-i; TODO: change back to 4-i
     }
     
 }
@@ -49,11 +49,18 @@ int translateInput(string input)
     }
 }
 
+void swapSeats()
+{
+    cout << "Press enter to swap seats." << endl;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
+    system("CLS");
+}
+
 int getXCoordinates()
 {
     string input;
     int posX;
-    bool rightInput = 0;
 
     cout << "\tRow (a-j): ";
     cin >> input;
@@ -69,13 +76,13 @@ int getXCoordinates()
             }
         } else if (isdigit(input[0])) {
             int num = input[0] - '0';
-            if (num >= 1 && num <= 9) {
+            if (num >= 1 && num <= 10) {
                 return num;
             }
         }
     }
     
-    cout << "Invalid input. Please enter a letter between a and j or number between 1-9." << endl;
+    cout << "Invalid input. Please enter a letter between a and j or number between 1-10." << endl;
     this_thread::sleep_for(chrono::milliseconds(3000));
     system("CLS");
     return getXCoordinates();
@@ -91,14 +98,22 @@ int getYCoordinates()
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    if (isValidNumber(input)) {
-        posY = translateInput(input);
-        if (posY >= 1 && posY <= 10) {
-            return posY;
+    if (input.length() == 1) {
+        if (isalpha(input[0])) {
+            char inputChar = tolower(input[0]);
+            if (inputChar >= 'a' && inputChar <= 'j') {
+                posY = inputChar - 'a' + 1;
+                return posY;
+            }
+        } else if (isdigit(input[0])) {
+            int num = input[0] - '0';
+            if (num >= 1 && num <= 10) {
+                return num;
+            }
         }
     }
     
-    cout << "Invalid input. Please enter a number between 1 and 10." << endl;
+    cout << "IInvalid input. Please enter a letter between a and j or number between 1-10." << endl;
     this_thread::sleep_for(chrono::milliseconds(3000));
     system("CLS");
     return getYCoordinates();

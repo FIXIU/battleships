@@ -107,10 +107,10 @@ void Board::printBoardForEnemy()
 }
 
 bool Board::placeShip(int posX, int posY, bool orientation, int length) {
-    // Check if position is valid
-    if (!canPlaceShip(posX, posY, orientation, length)) {
-        if (!silentMode) {  // Only show error if not in silent mode
-            cout << "Cannot place ship at this position!" << endl;
+    string errorMessage;
+    if (!canPlaceShip(posX, posY, orientation, length, errorMessage)) {
+        if (!silentMode) {
+            std::cout << "Cannot place ship: " << errorMessage << std::endl;
         }
         return false;
     }
@@ -126,9 +126,7 @@ bool Board::placeShip(int posX, int posY, bool orientation, int length) {
         }
     }
     
-    // Add ship to ships vector
     ships.push_back(Ship(length, posX, posY, orientation));
-    
     return true;
 }
 
@@ -283,20 +281,30 @@ bool Board::getSilentMode()
     return this -> silentMode;
 }
 
-bool Board::canPlaceShip(int posX, int posY, bool orientation, int length) {
+bool Board::canPlaceShip(int posX, int posY, bool orientation, int length, string &errorMessage) {
     // Check boundaries
     if (orientation) { // Horizontal
-        if (posY + length > boardSize) return false;
+        if (posY + length > boardSize) {
+            errorMessage = "Ship extends beyond right edge of the board.";
+            return false;
+        }
     } else { // Vertical
-        if (posX + length > boardSize) return false;
-    }
-    
-    // Check ship overlap and diagonals
-    for (int i = max(0, posX - 1); i <= min(boardSize - 1, posX + (orientation ? 1 : length)); i++) {
-        for (int j = max(0, posY - 1); j <= min(boardSize - 1, posY + (orientation ? length : 1)); j++) {
-            if (privateBoard[i][j] != '.') return false;
+        if (posX + length > boardSize) {
+            errorMessage = "Ship extends beyond bottom edge of the board.";
+            return false;
         }
     }
-    
+
+    // Check overlap and adjacent ships
+    for (int i = std::max(0, posX - 1); i <= std::min(boardSize - 1, posX + (orientation ? 1 : length)); i++) {
+        for (int j = std::max(0, posY - 1); j <= std::min(boardSize - 1, posY + (orientation ? length : 1)); j++) {
+            if (privateBoard[i][j] != '.') {
+                errorMessage = "Ship overlaps or is adjacent to another ship.";
+                return false;
+            }
+        }
+    }
+
+    errorMessage.clear();
     return true;
 }
